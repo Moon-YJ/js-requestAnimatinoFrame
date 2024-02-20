@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="main.js"></script>
+</head>
+
+<body>
+  <div id="box"></div>
+  <button>시작</button>
+</body>
+
+</html>
+
+<!-- 
+  - requestAnimationFrame 장점
+    : 시스템에 기본적으로 설정된 화면 주사율에 따라 반복 횟수가 자동 조절됨
+    : 시스템 상황에 따른 최적화된 모션 성능을 구현
+    : 화면 주사율에 맞춰서 동작되기 때문에 불필요하게 실행되는 반복처리가 없으므로 setInterval에 비해 오차범위가 정밀
+    : canvas에서 비트맵 방식으로 그림을 그리고 지우는 식으로 모션처리를 하기위해 나온 내장함수
+    : 자체 반복기능이 없기 때문에 재귀적으로 호출하면서 반복 처리 필요
+ -->
