@@ -2,51 +2,50 @@ const btn = document.querySelector('button');
 const box = document.querySelector('#box');
 
 btn.addEventListener('click', () => {
-	anime(box, {
-		prop: 'top',
-		value: '100%',
-		duration: 1000,
-		// callback: () => {
-		// 	anime(box, {
-		// 		prop: 'margin-top',
-		// 		value: 200,
-		// 		duration: 500,
-		// 	});
-		// },
+	anime(box, { width: 300, left: '50%', height: '100%', opacity: 0.2 }, 1000, () => {
+		anime(box, { width: 100, left: 0, height: 100, opacity: 1 }, 1000);
 	});
 });
 
-function anime(selector, option) {
+function anime(selector, props, duration, callback) {
 	const startTime = performance.now();
-	let currentValue = parseInt(getComputedStyle(selector)[option.prop]);
+	const keys = Object.keys(props);
+	const values = Object.values(props);
 
-	const isString = typeof option.value;
-	if (isString === 'string') {
-		const parentWid = parseFloat(getComputedStyle(selector.parentElement).width);
-		const parentHgt = parseFloat(getComputedStyle(selector.parentElement).height);
+	keys.forEach((key, idx) => setValue(key, values[idx], selector, duration, callback));
 
-		const x = ['left', 'right', 'width'];
-		const y = ['top', 'bottom', 'height'];
-		for (let cond of x) option.prop === cond && (currentValue = (currentValue / parentWid) * 100);
-		for (let cond of y) option.prop === cond && (currentValue = (currentValue / parentHgt) * 100);
-		if (option.prop.includes('margin') || option.prop.includes('padding'))
-			return console.error('margin, padding 속성은 %값을 적용할 수 없습니다.');
+	function setValue(key, value, selector, duration, callback) {
+		let currentValue = parseFloat(getComputedStyle(selector)[key]);
 
-		option.value = parseFloat(option.value);
-	}
-	requestAnimationFrame(move);
+		const isString = typeof value;
+		if (isString === 'string') {
+			const parentWid = parseFloat(getComputedStyle(selector.parentElement).width);
+			const parentHgt = parseFloat(getComputedStyle(selector.parentElement).height);
 
-	function move(time) {
-		// requestAnimationFrame에 의해서 콜백함수가 반복돌때마다의 누적시간값이 인수로 전달됨
-		let timelast = time - startTime;
-		let progress = timelast / option.duration;
+			const x = ['left', 'right', 'width'];
+			const y = ['top', 'bottom', 'height'];
+			for (let cond of x) key === cond && (currentValue = (currentValue / parentWid) * 100);
+			for (let cond of y) key === cond && (currentValue = (currentValue / parentHgt) * 100);
+			if (key.includes('margin') || key.includes('padding'))
+				return console.error('margin, padding 속성은 %값을 적용할 수 없습니다.');
 
-		progress < 0 && (progress = 0);
-		progress > 1 && (progress = 1);
-		progress < 1 ? requestAnimationFrame(move) : option.callback && option.callback();
+			value = parseFloat(value);
+		}
+		requestAnimationFrame(move);
 
-		const result = currentValue + (option.value - currentValue) * progress;
-		if (isString === 'string') selector.style[option.prop] = result + '%';
-		else selector.style[option.prop] = result + 'px';
+		function move(time) {
+			// requestAnimationFrame에 의해서 콜백함수가 반복돌때마다의 누적시간값이 인수로 전달됨
+			let timelast = time - startTime;
+			let progress = timelast / duration;
+
+			progress < 0 && (progress = 0);
+			progress > 1 && (progress = 1);
+			progress < 1 ? requestAnimationFrame(move) : callback && callback();
+
+			const result = currentValue + (value - currentValue) * progress;
+			if (isString === 'string') selector.style[key] = result + '%';
+			else if (key === 'opacity') selector.style[key] = result;
+			else selector.style[key] = result + 'px';
+		}
 	}
 }
