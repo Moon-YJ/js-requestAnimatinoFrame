@@ -3,9 +3,9 @@ const box = document.querySelector('#box');
 
 btn.addEventListener('click', () => {
 	anime(box, {
-		prop: 'width',
-		value: 300,
-		duration: 500,
+		prop: 'top',
+		value: '100%',
+		duration: 1000,
 		// callback: () => {
 		// 	anime(box, {
 		// 		prop: 'margin-top',
@@ -18,7 +18,22 @@ btn.addEventListener('click', () => {
 
 function anime(selector, option) {
 	const startTime = performance.now();
-	const currentValue = parseInt(getComputedStyle(selector)[option.prop]);
+	let currentValue = parseInt(getComputedStyle(selector)[option.prop]);
+
+	const isString = typeof option.value;
+	if (isString === 'string') {
+		const parentWid = parseFloat(getComputedStyle(selector.parentElement).width);
+		const parentHgt = parseFloat(getComputedStyle(selector.parentElement).height);
+
+		const x = ['left', 'right', 'width'];
+		const y = ['top', 'bottom', 'height'];
+		for (let cond of x) option.prop === cond && (currentValue = (currentValue / parentWid) * 100);
+		for (let cond of y) option.prop === cond && (currentValue = (currentValue / parentHgt) * 100);
+		if (option.prop.includes('margin') || option.prop.includes('padding'))
+			return console.error('margin, padding 속성은 %값을 적용할 수 없습니다.');
+
+		option.value = parseFloat(option.value);
+	}
 	requestAnimationFrame(move);
 
 	function move(time) {
@@ -28,11 +43,10 @@ function anime(selector, option) {
 
 		progress < 0 && (progress = 0);
 		progress > 1 && (progress = 1);
-		progress < 1
-			? requestAnimationFrame(move)
-			: option.callback && option.callback();
+		progress < 1 ? requestAnimationFrame(move) : option.callback && option.callback();
 
 		const result = currentValue + (option.value - currentValue) * progress;
-		selector.style[option.prop] = result + 'px';
+		if (isString === 'string') selector.style[option.prop] = result + '%';
+		else selector.style[option.prop] = result + 'px';
 	}
 }
