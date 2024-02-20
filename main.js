@@ -3,21 +3,22 @@ const box = document.querySelector('#box');
 
 btn.addEventListener('click', () => {
 	anime(box, {
-		prop: 'margin-left',
-		value: 100,
-		duration: 1000,
-		callback: () => {
-			anime(box, {
-				prop: 'margin-top',
-				value: 200,
-				duration: 500,
-			});
-		},
+		prop: 'width',
+		value: 300,
+		duration: 500,
+		// callback: () => {
+		// 	anime(box, {
+		// 		prop: 'margin-top',
+		// 		value: 200,
+		// 		duration: 500,
+		// 	});
+		// },
 	});
 });
 
 function anime(selector, option) {
-	startTime = performance.now();
+	const startTime = performance.now();
+	const currentValue = parseInt(getComputedStyle(selector)[option.prop]);
 	requestAnimationFrame(move);
 
 	function move(time) {
@@ -31,6 +32,7 @@ function anime(selector, option) {
 			? requestAnimationFrame(move)
 			: option.callback && option.callback();
 
-		selector.style[option.prop] = option.value * progress + 'px';
+		const result = currentValue + (option.value - currentValue) * progress;
+		selector.style[option.prop] = result + 'px';
 	}
 }
